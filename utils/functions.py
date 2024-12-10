@@ -168,39 +168,52 @@ def filter_future_years(df, year_column):
     current_year = datetime.now().year
     return df[df[year_column] <= current_year]
 
-def generate_clean_titles(df, title_col='title', clean_col='clean_title'):
+
+def clean_title(title):
     """
-    Cleans the movie titles by removing special characters and unnecessary data.
-    
+    Cleans a single title by removing leading/trailing spaces, normalizing spaces,
+    removing special characters, and converting the text to lowercase.
+
     Parameters:
-    df (pd.DataFrame): Input DataFrame.
-    title_col (str): Name of the column containing movie titles.
-    clean_col (str): Name of the new column for cleaned titles.
-    
+    -----------
+    title : str
+        The title string to be cleaned.
+
     Returns:
-    pd.DataFrame: DataFrame with an added column for cleaned titles.
-    """
-    def clean_title(title):
-        # Remove special characters and anything in parentheses or brackets
-        title = re.sub(r'[\[\]\(\)\{\}]', '', title)  # Remove brackets and parentheses
-        title = re.sub(r'[^a-zA-Z0-9\s]', '', title)  # Remove special characters
-        title = re.sub(r'\s+', ' ', title).strip()    # Remove extra spaces
-        return title
-
-    df[clean_col] = df[title_col].apply(clean_title)
-    return df
-
-def clean_titles(title):
-    """
-    Clean the movie title by:
-    - Stripping leading/trailing spaces
-    - Replacing multiple spaces with a single space
-    - Converting to lowercase
+    --------
+    str or None
+        The cleaned title if the input is a string, otherwise None.
     """
     if isinstance(title, str):  # Check if the title is a string
         title = title.strip()  # Remove leading/trailing spaces
         title = re.sub(r'\s+', ' ', title)  # Replace multiple spaces with a single space
-    return title
+        # Preserve Latin characters and spaces while removing other special characters
+        title = re.sub(
+            r'[^\w\sàáâäãåçèéêëìíîïñòóôöõùúûüýÿÀÁÂÄÃÅÇÈÉÊËÌÍÎÏÑÒÓÔÖÕÙÚÛÜÝ]', '', title
+        )
+        title = title.lower()  # Convert the title to lowercase
+        return title
+    return None  # Return None for non-string values
+
+
+def prepare_clean_titles(df, column_name):
+    """
+    Cleans the titles in a specified column of a DataFrame by removing special characters, 
+    normalizing spaces, and converting text to lowercase. The cleaned titles are returned 
+    as a pandas Series.
+    
+    Returns:
+    --------
+    pandas.Series
+        A Series with cleaned titles, where:
+        - Leading and trailing spaces are removed.
+        - Multiple spaces are replaced with a single space.
+        - Special characters (non-alphanumeric except Latin characters) are removed.
+        - Text is converted to lowercase.
+        - Non-string values are converted to None.
+    """ 
+    # Apply the clean_title function to the specified column
+    return df[column_name].apply(clean_title)
 
 def clean_and_remove_duplicates(df, column_name='title'):
     """
@@ -209,7 +222,7 @@ def clean_and_remove_duplicates(df, column_name='title'):
     and return the cleaned DataFrame along with the count of rows removed.
     """
 
-    df[column_name] = df[column_name].apply(clean_titles)
+    df[column_name] = df[column_name].apply(clean_title)
     
     duplicates = df[df[column_name].duplicated(keep=False)]
     
@@ -224,3 +237,33 @@ def clean_and_remove_duplicates(df, column_name='title'):
     print(f'Number of rows removed: {rows_removed}')
     
     return df
+
+def clean_genres(df, column_name):
+    """
+    Cleans movie genres in a specified column of a DataFrame by standardizing text to lowercase 
+    and ensuring consistent spacing after commas.
+
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        The DataFrame containing the column with movie genres to be cleaned.
+    column_name : str
+        The name of the column in the DataFrame that contains the genres to be cleaned.
+
+    Returns:
+    --------
+    pandas.Series
+        A Series with cleaned genres where:
+        - Text is converted to lowercase.
+        - Commas are followed by a single space for consistency.
+        - Non-string values are replaced with None.
+    """
+    def clean_genre(genre):
+        if isinstance(genre, str):  # Check if the genre is a string
+            genre = genre.lower()  # Convert to lowercase
+            genre = re.sub(r',\s*', ', ', genre)  # Ensure a single space after commas
+            return genre
+        return None  # Return None for non-string values
+
+    # Apply the clean_genre function to the specified column
+    return df[column_name].apply(clean_genre)
