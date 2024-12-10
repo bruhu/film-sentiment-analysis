@@ -126,22 +126,21 @@ def get_column_summary(df, column_name):
 
 # Cleaning
 
-def convert_strings_to_lowercase(df):
+def convert_strings_to_lowercase(df, column_name):
     """
-    Converts all string entries in a DataFrame to lowercase per column
-    and ensures there is a space after any comma in the strings, removes 
-    quote marks, and adjusts commas according to the specified conditions.
+    Converts all string entries in a specified column of a DataFrame to lowercase,
+    ensures there is a space after any comma in the strings, removes quote marks,
+    and adjusts commas according to the specified conditions.
     
     Parameters:
         df (pd.DataFrame): Input DataFrame.
+        column_name (str): The name of the column to process.
 
     Returns:
-        pd.DataFrame: DataFrame with string entries converted to lowercase,
-                      adjusted for spaces after commas, and processed quote marks 
-                      and commas.
+        pd.DataFrame: DataFrame with the specified column processed.
     """
-    for col in df.select_dtypes(include=['object', 'string']):
-        df[col] = df[col].map(
+    if column_name in df.columns and df[column_name].dtype in ['object', 'string']:
+        df[column_name] = df[column_name].map(
             lambda x: (
                 x.lower()
                 .replace('"', '')  # Remove all double quotes
@@ -150,7 +149,10 @@ def convert_strings_to_lowercase(df):
                 .replace(',', ', ')  # Add space after commas where necessary
             ) if isinstance(x, str) else x
         )
+    else:
+        raise ValueError(f"Column '{column_name}' does not exist or is not of type object/string.")
     return df
+
 
 
 def filter_future_years(df, year_column):
