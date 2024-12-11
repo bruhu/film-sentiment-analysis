@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import re
-
+import langcodes
 
 # Data Reading
 
@@ -154,7 +154,6 @@ def convert_strings_to_lowercase(df, column_name):
     return df
 
 
-
 def filter_future_years(df, year_column):
     """
     Removes rows from the DataFrame where the year in the specified column
@@ -269,3 +268,11 @@ def clean_genres(df, column_name):
 
     # Apply the clean_genre function to the specified column
     return df[column_name].apply(clean_genre)
+
+def get_language_name(code):
+    try:
+        # Get the language name in English
+        return langcodes.Language.make(code).language_name()
+    except:
+        # If the language code is not recognized, return the original code
+        return code
