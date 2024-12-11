@@ -48,7 +48,6 @@ The dataset used comes from a combination of **TMDB** (The Movie Database) and *
   
 ## **File Structure**
 
-├── data/ │ ├── tmdb_imdb_data.csv # Combined TMDB and IMDB movie dataset for 2018 │ ├── doesthedogdie_data.csv # Data on trigger warnings from doesthedogdie.com │ └── processed_data.csv # Processed data after scraping and sentiment analysis ├── notebooks/ │ ├── 1_data_exploration.ipynb # Jupyter notebook for data exploration and cleaning │ ├── 2_sentiment_analysis.ipynb # Jupyter notebook for sentiment analysis and comparison │ └── 3_visualization.ipynb # Jupyter notebook for generating word clouds and other plots ├── src/ │ ├── scraper.py # Python script for scraping data from TMDB, IMDB, and doesthedogdie.com │ ├── sentiment_analysis.py # Python script for performing sentiment analysis on reviews │ └── data_preprocessing.py # Python script for cleaning and processing raw data ├── requirements.txt # List of required Python packages └── README.md # This file
 
 ## **Installation**
 To get started, clone this repository and install the required dependencies:
