@@ -100,8 +100,10 @@ def drop_empty_rows(df):
     original_row_count = df.shape[0]
     df = df.dropna()
     cleaned_row_count = df.shape[0]
+    
     rows_removed = original_row_count - cleaned_row_count
     print(f'Rows removed: {rows_removed}')
+    
     return df, rows_removed
 
 def drop_empty_rows_from_column(df, column_name):
@@ -117,14 +119,13 @@ def drop_empty_rows_from_column(df, column_name):
         pd.DataFrame: The updated DataFrame with rows dropped.
     """
     initial_rows = len(df)
-    
     df = df.dropna(subset=[column_name])
     
     deleted_rows = initial_rows - len(df)
-    
     print(f'Number of rows deleted: {deleted_rows}')
     
     return df
+
 
 def rename_columns(df, rename_dict):
     """Rename columns based on a dictionary."""
