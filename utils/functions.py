@@ -88,21 +88,43 @@ def remove_duplicates(df):
     return df
 
 def drop_empty_rows(df):
-    # Get the original row count before dropping empty rows
+    """
+    Cleans the DataFrame by removing rows with missing values and reports the number of rows removed.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame to be cleaned.
+
+    Returns:
+        tuple: A tuple containing the cleaned DataFrame and the number of rows removed.
+    """
     original_row_count = df.shape[0]
-    
-    # Drop rows with missing values (NaN)
     df = df.dropna()
-    
-    # Get the row count after dropping empty rows
     cleaned_row_count = df.shape[0]
-    
-    # Calculate the number of rows removed
     rows_removed = original_row_count - cleaned_row_count
-    
-    # Return the cleaned DataFrame and the number of rows removed
     print(f'Rows removed: {rows_removed}')
     return df, rows_removed
+
+def drop_empty_rows_from_column(df, column_name):
+    """
+    Drops rows where the specified column has missing values and returns the updated DataFrame.
+    Also prints the number of rows deleted.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame.
+        column_name (str): The column to check for missing values.
+
+    Returns:
+        pd.DataFrame: The updated DataFrame with rows dropped.
+    """
+    initial_rows = len(df)
+    
+    df = df.dropna(subset=[column_name])
+    
+    deleted_rows = initial_rows - len(df)
+    
+    print(f'Number of rows deleted: {deleted_rows}')
+    
+    return df
 
 def rename_columns(df, rename_dict):
     """Rename columns based on a dictionary."""
