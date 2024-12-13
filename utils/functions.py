@@ -322,7 +322,7 @@ def get_language_name(code):
 def drop_rows_by_runtime(df, column_name='runtime', min_runtime=40):
     """
     Drops rows where the specified column contains a runtime less than the specified minimum runtime.
-    Prints how many rows were dropped and updates the original DataFrame.
+    Prints how many rows were dropped and returns the updated DataFrame.
 
     Parameters:
     -----------
@@ -335,8 +335,8 @@ def drop_rows_by_runtime(df, column_name='runtime', min_runtime=40):
 
     Returns:
     --------
-    None
-        The function modifies the original DataFrame in place.
+    pandas.DataFrame
+        The updated DataFrame with rows dropped.
     """
     # Ensure that 'runtime' column is treated as integers (convert non-numeric to NaN)
     df[column_name] = pd.to_numeric(df[column_name], errors='coerce')
@@ -354,3 +354,9 @@ def drop_rows_by_runtime(df, column_name='runtime', min_runtime=40):
     # Print how many rows have been dropped
     rows_dropped = rows_before - rows_after
     print(f'Number of rows dropped (runtime < {min_runtime}): {rows_dropped}')
+
+    return df  # Return the updated DataFrame
+
+# After modifying the function, now you can call it as:
+
+
