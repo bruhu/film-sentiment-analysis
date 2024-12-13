@@ -9,14 +9,14 @@ def assign_content_tags(df):
     """
     # Define the mapping of categories to their events
     categories = {
-        'Sexual Violence / Abuse': [
+        'Sexual Violence and Abuse': [
             'stalking', 'abused forgives abuser', 'abused becomes abuser', 'gaslighting abuse with belt',
             'women brutalized for spectacle', 'domestic violence', 'rape mentions', 'sexual assault',
             'sexual assault on men is a joke', 'onscreen rape', 'women slapped', 'sexualized minor',
             'kidnapping', 'cheating', 'incarceration', 'BDSM', 'being watched', 'large age gap',
             'lose virginity', 'sexual objectification', 'incest', 'sexual content', 'bestiality'
         ],
-        'Horror / Supernatural': [
+        'Horror and Supernatural': [
             'non-human death', 'ghosts', 'jump scares', 'demonic possession', 'shaky cam',
             'sudden loud noises', 'screaming', 'demons or Hell', 'blood or gore', 'being watched',
             'self-sacrifice'
@@ -37,7 +37,7 @@ def assign_content_tags(df):
             'cats dying', 'pets die', 'dragons dying', 'horses dying', 'abandoned animals',
             'non-human death', 'bestiality'
         ],
-        'Medical / Health': [
+        'Medical and Health': [
             'restraints amputation', 'Achilles tendon injury', 'asphyxiation', 'genital trauma/mutilation',
             'unconscious', 'bones breaking', 'seizures', 'overdose', 'vomiting', 'needles or syringes are used',
             'electro-therapy', 'hospital scenes', 'menstruation', 'cancer', 'mental institutions',
@@ -52,7 +52,7 @@ def assign_content_tags(df):
             'child abuse', 'abusive parents', 'pedophilia', 'infant abduction', 'sexualized minor',
             'kids dying', 'parents dying', 'dear toy destruction', 'crying babies', 'large age gap'
         ],
-        'Death / Trauma / Grief': [
+        'Death and Grief': [
             'abusive parents', 'kids dying', 'self-sacrifice', 'non-human death', 'someone dies',
             'major character dies', 'parents dying', 'family dies', 'cancer', 'suicide attempts',
             'people dying by suicide', 'strokes', 'chronic illnesses', 'terminal illness', 'ghosts', '9/11'
@@ -62,13 +62,13 @@ def assign_content_tags(df):
             'deadnaming / birthnaming', 'LGBT+ person outed', 'transphobic slurs', 'bisexual cheating',
             'homophobic slurs', 'man in a dress jokes', 'misgendering', 'LGBT people dying', 'male crying ridicule'
         ],
-        'Systemic Issues / Social Injustice': [
+        'Systemic Issues and Social Injustice': [
             'beaten up by bully', 'disabled played by able-bodied', 'R-slur', 'copaganda', 'incarceration',
             'trans person depicted predatorily', 'homelessness', 'anti-abortion', 'religion discussed',
             'antisemitism', 'n-word usage', 'black guy dies first', 'hate speech', 'minority misrepresentation',
             'blackface'
         ],
-        'Fear / Anxiety': [
+        'Fear and Anxiety': [
             'snakes', 'spiders', 'bugs', 'stalking', 'held under water', 'shaving or cutting', 'bedbugs',
             'family dies', 'bodies of water', 'clowns', 'trypophobia', 'razors', 'mannequins', 'vomiting',
             'needles or syringes are used', 'being watched', 'aphobia', 'alligators/crocodiles', 'sharks',
@@ -82,7 +82,7 @@ def assign_content_tags(df):
             'shaky cam', 'crying babies', 'screaming', 'flashing lights or images', 'car honk / tire screech',
             'obscene language/gestures', 'being watched', 'stalking', 'claustrophobic scenes'
         ],
-        'Gore / Body Horror': [
+        'Gore and Body Horror': [
             'hand damage', 'dislocations', 'throat mutilation', 'choking', 'decapitation', 'cannibalism',
             'crushed to death', 'people being burned alive', 'buried alive', 'body horror', 'amputation',
             'heads getting squashed', 'shaving or cutting', 'genital trauma/mutilation', 'bones breaking',
@@ -94,7 +94,7 @@ def assign_content_tags(df):
             'women brutalized for spectacle', 'domestic violence', 'sexual assault', 'onscreen rape',
             'women slapped', 'anti-abortion', 'stalked', 'being watched', 'large age gap'
         ],
-        'Mental Health / Ableism': [
+        'Mental Health and Ableism': [
             'seizures', 'disabled played by able-bodied', 'R-slur', 'electro-therapy', 'mental institutions',
             'self harming', 'autism misrepresented', 'violent mentally ill person', 'dissociation / depersonalization / derealization',
             'D.I.D. misrepresentation', 'autism abuse', 'suicide attempts', 'reality unhinged', 'mental illness',
@@ -102,28 +102,27 @@ def assign_content_tags(df):
             'claustrophobic scenes', 'eating disorders', 'people dying by suicide', 'PTSD', 'meltdowns', 'ableism',
             "dementia/Alzheimer's"
         ],
-        'Addiction / Substance Abuse': [
+        'Addiction and Substance Abuse': [
             'alcohol abuse', 'addiction', 'drug use', 'druggings', 'overdose', 'needles or syringes are used'
         ],
-        'Catastrophes / Accidents': [
+        'Catastrophes and Accidents': [
             'car crashes', 'planes crashing', 'people getting hit by cars', 'drownings', 'nuclear explosions',
             'gun violence', '9/11', 'copaganda', 'incarceration', 'falling down stairs', 'falling deaths'
         ],
-        'Body Shaming / Fatphobia': [
+        'Body Shaming and Fatphobia': [
             'fat jokes', 'eating disorders', 'fat suits', 'vomiting', 'mental institutions', 'self harming',
             'body dysphoria', 'body dysmorphia'
         ],
-        'Plot Warnings / Spoilers': [
+        'Plot Warnings and Spoilers': [
             'major character dies', 'leave without goodbye', 'jump scares', 'fourth wall', 'Santa (et al) spoilers',
             'end credit scenes', 'sad endings'
         ]
     }
 
-
-    # # usage
-    # df['content_tags'] = df['events'].apply(
-    #     lambda events: [
-    #         category for category, tags in categories.items() if any(event.strip() in tags for event in events.split(","))
-    #     ]
-    # )
-    # return df
+    df['content_tags'] = df['events'].apply(
+        lambda events: ", ".join([
+            category for category, tags in categories.items() if any(str(event).strip() in tags for event in str(events).split(","))
+            ]) if isinstance(events, str) else ""  # Handle non-string values
+        )
+    
+    return df
