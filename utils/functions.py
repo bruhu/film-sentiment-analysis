@@ -119,7 +119,7 @@ def drop_empty_rows_from_column(df, column_name):
         pd.DataFrame: The updated DataFrame with rows dropped.
     """
     initial_rows = len(df)
-    df = df.dropna(subset=[column_name], inplace=True)
+    df = df.dropna(subset=[column_name])
     
     deleted_rows = initial_rows - len(df)
     print(f'Number of rows deleted: {deleted_rows}')
@@ -321,8 +321,8 @@ def get_language_name(code):
 
 def drop_rows_by_runtime(df, column_name='runtime', min_runtime=40):
     """
-    Drops rows where the specified column contains a runtime less than the specified minimum runtime
-    and prints how many rows were dropped.
+    Drops rows where the specified column contains a runtime less than the specified minimum runtime.
+    Prints how many rows were dropped and updates the original DataFrame.
 
     Parameters:
     -----------
@@ -335,19 +335,22 @@ def drop_rows_by_runtime(df, column_name='runtime', min_runtime=40):
 
     Returns:
     --------
-    pandas.DataFrame
-        A new DataFrame with rows having runtime less than the specified value removed.
+    None
+        The function modifies the original DataFrame in place.
     """
     # Ensure that 'runtime' column is treated as integers (convert non-numeric to NaN)
     df[column_name] = pd.to_numeric(df[column_name], errors='coerce')
 
-    # Filter the DataFrame to exclude rows with runtime less than min_runtime
-    rows_before = len(df)  # Number of rows before filtering
-    filtered_df = df[df[column_name] >= min_runtime]  # Keep rows with runtime >= min_runtime
-    rows_after = len(filtered_df)  # Number of rows after filtering
+    # Count rows before filtering
+    rows_before = len(df)
+
+    # Drop rows where runtime is less than min_runtime
+    df.dropna(subset=[column_name], inplace=True)  # Drop rows where 'runtime' is NaN after conversion
+    df.drop(df[df[column_name] < min_runtime].index, inplace=True)
+
+    # Count rows after filtering
+    rows_after = len(df)
 
     # Print how many rows have been dropped
     rows_dropped = rows_before - rows_after
     print(f'Number of rows dropped (runtime < {min_runtime}): {rows_dropped}')
-
-    return filtered_df
