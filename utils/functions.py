@@ -4,9 +4,7 @@ from datetime import datetime
 import re
 import langcodes
 
-# -------------------------------
-# Data Inspection & Information
-# -------------------------------
+# Data Reading
 
 def show_data_types(df):
     """Show data types of all columns in the DataFrame."""
@@ -78,9 +76,7 @@ def show_null_percentage(df):
     print(null_percentage)
 
 
-# -------------------------------
 # Basic Data Cleaning
-# -------------------------------
 
 def remove_duplicates(df):
     """Remove duplicate rows from a DataFrame."""
@@ -151,9 +147,7 @@ def get_column_summary(df, column_name):
     return df[column_name].describe()
 
 
-# -------------------------------
-# Text and String Cleaning
-# -------------------------------
+# Cleaning
 
 def convert_strings_to_lowercase(df, column_name):
     """
@@ -224,7 +218,7 @@ def clean_title(title):
     removing special characters, and converting the text to lowercase.
 
     Parameters:
-    ----------- 
+    -----------
     title : str
         The title string to be cleaned.
 
@@ -267,25 +261,96 @@ def prepare_clean_titles(df, column_name):
 def clean_and_remove_duplicates(df, column_name='title'):
     """
     Clean the title column (strip spaces, normalize multiple spaces, convert to lowercase),
-    remove duplicates based on the cleaned title, and return the cleaned DataFrame.
+    remove duplicates based on the cleaned titles, 
+    and return the cleaned DataFrame along with the count of rows removed.
+    """
+
+    df[column_name] = df[column_name].apply(clean_title)
     
+    duplicates = df[df[column_name].duplicated(keep=False)]
+    
+    num_duplicates = len(duplicates)
+    print(f'Number of duplicate rows before cleaning: {num_duplicates}')
+    
+    rows_before = len(df)
+    df = df.drop_duplicates(subset=column_name, keep='first')
+    
+    rows_after = len(df)
+    rows_removed = rows_before - rows_after
+    print(f'Number of rows removed: {rows_removed}')
+    
+    return df
+
+def clean_genres(df, column_name):
+    """
+    Cleans movie genres in a specified column of a DataFrame by standardizing text to lowercase 
+    and ensuring consistent spacing after commas.
+
     Parameters:
     -----------
     df : pandas.DataFrame
-        The input DataFrame containing titles to be cleaned.
-    
-    column_name : str, optional
-        The name of the column to clean, default is 'title'.
-    
+        The DataFrame containing the column with movie genres to be cleaned.
+    column_name : str
+        The name of the column in the DataFrame that contains the genres to be cleaned.
+
     Returns:
     --------
-    pandas.DataFrame
-        The cleaned and deduplicated DataFrame.
+    pandas.Series
+        A Series with cleaned genres where:
+        - Text is converted to lowercase.
+        - Commas are followed by a single space for consistency.
+        - Non-string values are replaced with None.
     """
-    # Clean the titles
-    df[column_name] = prepare_clean_titles(df, column_name)
-    
-    # Drop duplicate rows based on the cleaned title column
-    df = df.drop_duplicates(subset=[column_name])
-    
-    return df
+    def clean_genre(genre):
+        if isinstance(genre, str):  # Check if the genre is a string
+            genre = genre.lower()  # Convert to lowercase
+            genre = re.sub(r',\s*', ', ', genre)  # Ensure a single space after commas
+            return genre
+        return None  # Return None for non-string values
+
+    # Apply the clean_genre function to the specified column
+    return df[column_name].apply(clean_genre)
+
+def get_language_name(code):
+    try:
+        # Get the language name in English
+        return langcodes.Language.make(code).language_name()
+    except:
+        # If the language code is not recognized, return the original code
+        return code
+
+def drop_rows_by_runtime(df, column_name='runtime', min_runtime=40):
+    """
+    Drops rows where the specified column contains a runtime less than the specified minimum runtime.
+    Prints how many rows were dropped and updates the original DataFrame.
+
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        The DataFrame to process.
+    column_name : str
+        The name of the column containing runtime values.
+    min_runtime : int
+        The minimum runtime value. Rows with runtime less than this value will be dropped.
+
+    Returns:
+    --------
+    None
+        The function modifies the original DataFrame in place.
+    """
+    # Ensure that 'runtime' column is treated as integers (convert non-numeric to NaN)
+    df[column_name] = pd.to_numeric(df[column_name], errors='coerce')
+
+    # Count rows before filtering
+    rows_before = len(df)
+
+    # Drop rows where runtime is less than min_runtime
+    df.dropna(subset=[column_name], inplace=True)  # Drop rows where 'runtime' is NaN after conversion
+    df.drop(df[df[column_name] < min_runtime].index, inplace=True)
+
+    # Count rows after filtering
+    rows_after = len(df)
+
+    # Print how many rows have been dropped
+    rows_dropped = rows_before - rows_after
+    print(f'Number of rows dropped (runtime < {min_runtime}): {rows_dropped}')
