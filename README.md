@@ -18,8 +18,8 @@ The dataset used comes from a combination of **TMDB** (The Movie Database) and *
 
 ## **Approach**
 1. **Data Collection**:
-   - Movies from **2018** will be scraped from **TMDB** and **IMDB**.
-   - Additional data regarding trigger warnings will be scraped from **doesthedogdie.com**.
+   - Movies be scraped from **TMDB** and **IMDB**.
+   - Additional data regarding trigger warnings will be obtained from **doesthedogdie.com**.
    - The data will be processed and cleaned to focus on key fields like **genres**, **reviews**, and **trigger warning information**.
 
 2. **Sentiment Analysis**:
