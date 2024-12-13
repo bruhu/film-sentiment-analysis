@@ -119,7 +119,7 @@ def drop_empty_rows_from_column(df, column_name):
         pd.DataFrame: The updated DataFrame with rows dropped.
     """
     initial_rows = len(df)
-    df = df.dropna(subset=[column_name])
+    df = df.dropna(subset=[column_name], inplace=True)
     
     deleted_rows = initial_rows - len(df)
     print(f'Number of rows deleted: {deleted_rows}')
@@ -174,6 +174,25 @@ def convert_strings_to_lowercase(df, column_name):
         )
     else:
         raise ValueError(f"Column '{column_name}' does not exist or is not of type object/string.")
+    return df
+
+def convert_columns_to_int(df, columns):
+    """
+    Converts specified columns in the DataFrame to Int64 type, handling errors gracefully.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame containing the data.
+    columns (list): List of column names to convert.
+
+    Returns:
+    pd.DataFrame: The DataFrame with specified columns converted to Int64 type.
+    """
+    # Check if the columns exist in the DataFrame
+    columns_to_convert = [col for col in columns if col in df.columns]
+
+    # Convert the specified columns to 'Int64' type, handling errors gracefully
+    df[columns_to_convert] = df[columns_to_convert].apply(pd.to_numeric, errors='coerce').astype('Int64')
+
     return df
 
 
@@ -299,3 +318,36 @@ def get_language_name(code):
     except:
         # If the language code is not recognized, return the original code
         return code
+
+def drop_rows_by_runtime(df, column_name='runtime', min_runtime=40):
+    """
+    Drops rows where the specified column contains a runtime less than the specified minimum runtime
+    and prints how many rows were dropped.
+
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        The DataFrame to process.
+    column_name : str
+        The name of the column containing runtime values.
+    min_runtime : int
+        The minimum runtime value. Rows with runtime less than this value will be dropped.
+
+    Returns:
+    --------
+    pandas.DataFrame
+        A new DataFrame with rows having runtime less than the specified value removed.
+    """
+    # Ensure that 'runtime' column is treated as integers (convert non-numeric to NaN)
+    df[column_name] = pd.to_numeric(df[column_name], errors='coerce')
+
+    # Filter the DataFrame to exclude rows with runtime less than min_runtime
+    rows_before = len(df)  # Number of rows before filtering
+    filtered_df = df[df[column_name] >= min_runtime]  # Keep rows with runtime >= min_runtime
+    rows_after = len(filtered_df)  # Number of rows after filtering
+
+    # Print how many rows have been dropped
+    rows_dropped = rows_before - rows_after
+    print(f'Number of rows dropped (runtime < {min_runtime}): {rows_dropped}')
+
+    return filtered_df
