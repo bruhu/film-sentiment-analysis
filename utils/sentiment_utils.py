@@ -40,7 +40,8 @@ def word_rating_correlation(df, text_column, rating_column, top_n=10):
     # Plot the top correlated words
     words, corrs = zip(*top_correlated_words)
     fig = px.bar(x=words, y=corrs, title=f'Top {top_n} Words Correlated with Ratings',
-                 labels={'x': 'Words', 'y': 'Spearman Correlation'}, color=corrs)
+                 labels={'x': 'Words', 'y': 'Spearman Correlation'}, color=corrs,
+                 color_continuous_scale='Temps_r')
     fig.update_layout(xaxis_tickangle=-45)
     fig.show()
     
@@ -87,7 +88,8 @@ def analyze_most_common_words(df, text_column, top_n=50):
     # Extract words and counts for plotting
     words, counts = zip(*most_common_words)
     fig = px.bar(x=words, y=counts, title=f'Most Common Words in {text_column}',
-                 labels={'x': 'Words', 'y': 'Frequency'}, color=counts)
+                 labels={'x': 'Words', 'y': 'Frequency'}, color=counts,
+                 color_continuous_scale='Matter')
     fig.update_layout(xaxis_tickangle=-45)
     fig.show()
     
