@@ -91,6 +91,34 @@ def convert_columns_to_int(df, columns):
 
     return df
 
+def group_and_join_columns(
+    df_main, df_to_group, group_by_col, join_col, new_col_name=None, separator=', ', fillna_value=''
+):
+    """
+    Groups and joins values from a specified column, then merges the result back to the main dataframe.
+    """
+    if new_col_name is None:
+        new_col_name = join_col + 's'
+    
+    # Group by and join values
+    grouped = (
+        df_to_group.groupby(group_by_col)[join_col]
+        .apply(lambda x: separator.join(x))
+        .reset_index()
+    )
+
+    # Rename the join_col in df_to_group to avoid conflicts (e.g., 'name' -> 'director')
+    grouped.rename(columns={join_col: new_col_name}, inplace=True)
+
+    # Merge with the main dataframe
+    df_main = df_main.merge(grouped, on=group_by_col, how='left')
+
+    # Replace NaN values with the specified value
+    df_main[new_col_name] = df_main[new_col_name].fillna(fillna_value)
+
+    return df_main
+
+
 def update_empty_column(
     df_main, df_mapping, main_column, mapping_column, new_column, default_column=None
 ):
