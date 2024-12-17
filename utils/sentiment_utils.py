@@ -94,3 +94,31 @@ def analyze_most_common_words(df, text_column, top_n=50):
     fig.show()
     
     return most_common_words
+
+
+def group_and_join_columns(
+    df_main, df_to_group, group_by_col, join_col, new_col_name=None, separator=', ', fillna_value=''
+):
+    """
+    Groups and joins values from a specified column, then merges the result back to the main dataframe.
+
+    """
+    if new_col_name is None:
+        new_col_name = join_col + 's'
+    
+    # Group by and join values
+    grouped = (
+        df_to_group.groupby(group_by_col)[join_col]
+        .apply(lambda x: separator.join(x))
+        .reset_index()
+    )
+
+    # Merge with the main dataframe
+    df_main = df_main.merge(grouped, on=group_by_col, how='left')
+
+    # Ensure the column exists before renaming or filling NaN
+    if join_col in df_main.columns:
+        df_main[join_col] = df_main[join_col].fillna(fillna_value)  # Replace NaN values
+        df_main.rename(columns={join_col: new_col_name}, inplace=True)  # Rename the column
+
+    return df_main
