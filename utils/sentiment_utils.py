@@ -5,6 +5,7 @@ from scipy.stats import spearmanr
 import re
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from nltk.sentiment import SentimentIntensityAnalyzer
 from collections import Counter
 
 def word_rating_correlation(df, text_column, rating_column, top_n=10):
@@ -95,30 +96,86 @@ def analyze_most_common_words(df, text_column, top_n=50):
     
     return most_common_words
 
+def explode_column(df, column, separator=','):
+    """
+    Splits the specified column by a separator and explodes the values into separate rows.
 
-def group_and_join_columns(
-    df_main, df_to_group, group_by_col, join_col, new_col_name=None, separator=', ', fillna_value=''
-):
     """
-    Groups and joins values from a specified column, then merges the result back to the main dataframe.
-    """
-    if new_col_name is None:
-        new_col_name = join_col + 's'
+    # Split the column by the separator
+    df[column] = df[column].str.split(separator)
+
+    # Explode the column into separate rows
+    df_exploded = df.explode(column)
     
-    # Group by and join values
-    grouped = (
-        df_to_group.groupby(group_by_col)[join_col]
-        .apply(lambda x: separator.join(x))
-        .reset_index()
-    )
+    return df_exploded
 
-    # Rename the join_col in df_to_group to avoid conflicts (e.g., 'name' -> 'director')
-    grouped.rename(columns={join_col: new_col_name}, inplace=True)
+def explode_column_from_string(df, column, separator=','):
+    """
+    Explodes a specified column in the DataFrame by splitting its string values by a separator
+    and creating separate rows for each split value.
+    
+    """
+    # Ensure the column is a list or split it if it's a string
+    df[column] = df[column].apply(lambda x: x.split(separator) if isinstance(x, str) else x)
+    
+    # Explode the column into separate rows
+    df_exploded = df.explode(column)
+    
+    return df_exploded
 
-    # Merge with the main dataframe
-    df_main = df_main.merge(grouped, on=group_by_col, how='left')
+def plot_sentiment_distribution(df, category_column, sentiment_column, title, xaxis_title, yaxis_title):
+    """
+    Visualizes the sentiment distribution by a specified categorical column (e.g., language, events, themes).
+    
+    """
+    fig = px.box(df, 
+                 x=category_column, 
+                 y=sentiment_column, 
+                 title=title,
+                 labels={category_column: xaxis_title, sentiment_column: yaxis_title})
+    
+    fig.update_layout(xaxis_tickangle=-45)
+    fig.show()
+    
 
-    # Replace NaN values with the specified value
-    df_main[new_col_name] = df_main[new_col_name].fillna(fillna_value)
 
-    return df_main
+# Initialize the sentiment intensity analyzer
+
+
+def get_sentiment_score(text):
+    """Calculates the sentiment score for a given text."""
+    
+    sia = SentimentIntensityAnalyzer()
+    
+    if isinstance(text, str):  # Check if the text is a valid string
+        return sia.polarity_scores(text)['compound']
+    return 0  # Return 0 for non-string values
+
+def add_sentiment_columns(df, columns):
+    """
+    Adds sentiment score columns to the DataFrame for each specified text column.
+    
+    Parameters:
+    - df: The DataFrame containing the data.
+    - columns: A list of column names that contain text to analyze for sentiment.
+    
+    Returns:
+    - df: The DataFrame with added sentiment columns.
+    """
+    for column in columns:
+        sentiment_column_name = f'sentiment_{column}'
+        df[sentiment_column_name] = df[column].apply(get_sentiment_score)
+    
+    return df
+
+def calculate_overall_sentiment(df, sentiment_columns, new_column_name='overall_sentiment'):
+    """
+    Calculate the overall sentiment for the DataFrame by averaging the sentiment scores
+    from the specified columns.
+
+    """
+    # Calculate the overall sentiment by averaging the specified sentiment columns
+    df[new_column_name] = df[sentiment_columns].mean(axis=1)
+    return df
+
+
