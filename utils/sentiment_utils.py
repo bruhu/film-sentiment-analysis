@@ -124,28 +124,86 @@ def word_rating_correlation(df, text_column, rating_column, top_n=10):
     fig.show()  
     
 
+# def analyze_most_common_words(df, text_column, top_n=50):
+#     """
+#     Analyzes, visualizes, and prints the most common words in a specified text column.
+
+#     """
+#     processed_column = f"processed_{text_column}"
+
+#     df[processed_column] = df[text_column].apply(preprocess_text) # text preprocessing
+    
+#     all_tokens = [word for tokens in df[processed_column] for word in tokens] # flatten tokens
+    
+#     word_freq = Counter(all_tokens)
+#     most_common_words = word_freq.most_common(top_n)
+    
+#     print(f'Most common words in {text_column}:')
+#     print(most_common_words)
+    
+#     words, counts = zip(*most_common_words)
+#     fig = px.bar(x=words, y=counts, title=f'Most Common Words in {text_column}',
+#                  labels={'x': 'Words', 'y': 'Frequency'}, color=counts,
+#                  color_continuous_scale='Matter')
+#     fig.update_layout(xaxis_tickangle=-45)
+#     fig.show()
+    
+#     return most_common_words
+
 def analyze_most_common_words(df, text_column, top_n=50):
     """
-    Analyzes, visualizes, and prints the most common words in a specified text column.
-
+    Analyzes, visualizes, and prints the most common words in a specified text column,
+    with counts and percentages displayed.
     """
     processed_column = f"processed_{text_column}"
-
-    df[processed_column] = df[text_column].apply(preprocess_text) # text preprocessing
     
-    all_tokens = [word for tokens in df[processed_column] for word in tokens] # flatten tokens
+    # Preprocess the text column
+    df[processed_column] = df[text_column].apply(preprocess_text)  # Assumes preprocess_text is defined
     
+    # Flatten all tokens into a single list
+    all_tokens = [word for tokens in df[processed_column] for word in tokens]
+    total_word_count = len(all_tokens)
+    
+    # Count the most common words
     word_freq = Counter(all_tokens)
     most_common_words = word_freq.most_common(top_n)
     
-    print(f'Most common words in {text_column}:')
-    print(most_common_words)
+    # Print results
+    print(f"Top {top_n} most common words in '{text_column}':\n")
+    print(f"{'Word':<15}{'Count':<10}{'Percentage (%)':<10}")
+    print("-" * 35)
+    for word, count in most_common_words:
+        percentage = (count / total_word_count) * 100
+        print(f"{word:<15}{count:<10}{percentage:.2f}")
     
+    # Prepare data for Plotly
     words, counts = zip(*most_common_words)
-    fig = px.bar(x=words, y=counts, title=f'Most Common Words in {text_column}',
-                 labels={'x': 'Words', 'y': 'Frequency'}, color=counts,
-                 color_continuous_scale='Matter')
+    percentages = [round((count / total_word_count) * 100, 2) for count in counts]
+    
+    # Create a DataFrame for Plotly
+    plot_df = pd.DataFrame({
+        'Words': words,
+        'Counts': counts,
+        'Percentage': percentages
+    })
+    
+    # Create the bar plot
+    fig = px.bar(plot_df, 
+                 x='Words', 
+                 y='Counts', 
+                 title=f'Most Common Words in {text_column}',
+                 labels={'Counts': 'Frequency', 'Words': 'Words'},
+                 color='Counts',
+                 color_continuous_scale='Matter',
+                 hover_data={'Words': True, 'Counts': True, 'Percentage': True})
+    
+    # Update layout and hover template
     fig.update_layout(xaxis_tickangle=-45)
+    fig.update_traces(hovertemplate='<b>Word:</b> %{x}<br>'
+                                    '<b>Count:</b> %{y}<br>'
+                                    '<b>Percentage:</b> %{customdata[0]}%')
+    
+    # Show the figure
     fig.show()
     
     return most_common_words
