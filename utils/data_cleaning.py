@@ -91,6 +91,39 @@ def convert_columns_to_int(df, columns):
 
     return df
 
+def update_empty_column(
+    df_main, df_mapping, main_column, mapping_column, new_column, default_column=None
+):
+    """
+    Updates a column in the main dataframe ('df_main') by mapping values from a secondary dataframe ('df_mapping').
+    
+    This function fills missing values in the 'new_column' of the main dataframe by mapping values from the
+    'mapping_column' of the 'df_mapping' dataframe based on matching values from 'main_column'. If the
+    'mapping_column' is missing in the mapping dataframe or if the 'new_column' does not exist in the main
+    dataframe, the function handles those cases gracefully. Optionally, it can also use a default column 
+    ('default_column') in the mapping dataframe to fill any remaining missing values after the initial mapping.
+
+    """
+    if mapping_column in df_mapping.columns:
+        mapping_dict = df_mapping.set_index(main_column)[mapping_column]
+
+        # Ensure that the 'new_column' exists in the main dataframe
+        if new_column not in df_main.columns:
+            df_main[new_column] = pd.NA 
+
+        df_main[new_column] = df_main[new_column].combine_first(
+            df_main[main_column].map(mapping_dict)
+        )
+
+        if default_column and default_column in df_mapping.columns:
+            df_main[new_column] = df_main[new_column].fillna(
+                df_main[main_column].map(df_mapping.set_index(main_column)[default_column])
+            )
+    else:
+        print(f"Warning: '{mapping_column}' is missing in the mapping dataframe. Skipping update.")
+    
+    return df_main
+
 
 def filter_future_years(df, year_column):
     """

@@ -101,7 +101,6 @@ def group_and_join_columns(
 ):
     """
     Groups and joins values from a specified column, then merges the result back to the main dataframe.
-
     """
     if new_col_name is None:
         new_col_name = join_col + 's'
@@ -113,12 +112,13 @@ def group_and_join_columns(
         .reset_index()
     )
 
+    # Rename the join_col in df_to_group to avoid conflicts (e.g., 'name' -> 'director')
+    grouped.rename(columns={join_col: new_col_name}, inplace=True)
+
     # Merge with the main dataframe
     df_main = df_main.merge(grouped, on=group_by_col, how='left')
 
-    # Ensure the column exists before renaming or filling NaN
-    if join_col in df_main.columns:
-        df_main[join_col] = df_main[join_col].fillna(fillna_value)  # Replace NaN values
-        df_main.rename(columns={join_col: new_col_name}, inplace=True)  # Rename the column
+    # Replace NaN values with the specified value
+    df_main[new_col_name] = df_main[new_col_name].fillna(fillna_value)
 
     return df_main
