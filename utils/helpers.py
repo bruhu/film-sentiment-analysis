@@ -2,41 +2,26 @@ import pandas as pd
 import re
 import langcodes
 
+
+# ------------------------------
+# Title Cleaning Functions
+# ------------------------------
+
 def clean_title(title):
     """
     Cleans a single title by removing leading/trailing spaces, normalizing spaces,
     removing special characters, and converting the text to lowercase.
     """
-    if isinstance(title, str):  # Check if the title is a string
-        title = title.strip()  # Remove leading/trailing spaces
-        title = re.sub(r'\s+', ' ', title)  # Replace multiple spaces with a single space
-        # Preserve Latin characters and spaces while removing other special characters
+    if isinstance(title, str): 
+        title = title.strip()  
+        title = re.sub(r'\s+', ' ', title) 
         title = re.sub(
-            r'[^\w\sàáâäãåçèéêëìíîïñòóôöõùúûüýÿÀÁÂÄÃÅÇÈÉÊËÌÍÎÏÑÒÓÔÖÕÙÚÛÜÝ]', '', title
+            r'[^\w\sàáâäãåçèéêëìíîïñòóôöõùúûüýÿÀÁÂÄÃÅÇÈÉÊËÌÍÎÏÑÒÓÔÖÕÙÚÛÜÝ]', '', title # remove special chars, keep Latin chars and spaces
         )
-        title = title.lower()  # Convert the title to lowercase
+        title = title.lower()  
         return title
-    return None  # Return None for non-string values
+    return None  
 
-def clean_genres(df, column_name):
-    """
-    Cleans movie genres in a specified column of a DataFrame by standardizing text to lowercase 
-    and ensuring consistent spacing after commas.
-    """
-    def clean_genre(genre):
-        if isinstance(genre, str):  # Check if the genre is a string
-            genre = genre.lower()  # Convert to lowercase
-            genre = re.sub(r',\s*', ', ', genre)  # Ensure a single space after commas
-            return genre
-        return None  # Return None for non-string values
-
-    return df[column_name].apply(clean_genre)
-
-def get_language_name(code):
-    try:
-        return langcodes.Language.make(code).language_name()
-    except:
-        return code
 
 def prepare_clean_titles(df, column_name):
     """
@@ -45,6 +30,7 @@ def prepare_clean_titles(df, column_name):
     as a pandas Series.
     """ 
     return df[column_name].apply(clean_title)
+
 
 def clean_and_remove_duplicates(df, column_name='title'):
     """
@@ -69,23 +55,63 @@ def clean_and_remove_duplicates(df, column_name='title'):
     
     return df
 
-def drop_rows_by_runtime(df, column_name='runtime', min_runtime=40):
+
+# ------------------------------
+# Genre Cleaning Functions
+# ------------------------------
+
+def clean_genres(df, column_name):
     """
-    Drops rows where the specified column contains a runtime less than the specified minimum runtime.
+    Cleans movie genres in a specified column of a DataFrame by standardizing text to lowercase 
+    and ensuring consistent spacing after commas.
+    """
+    def clean_genre(genre):
+        if isinstance(genre, str):  
+            genre = genre.lower()  
+            genre = re.sub(r',\s*', ', ', genre)  
+            return genre
+        return None 
+
+    return df[column_name].apply(clean_genre)
+
+
+# ------------------------------
+# Language Functions
+# ------------------------------
+
+def get_language_name(code):
+    """
+    Returns the language name based on the provided language code using the langcodes library.
+    If the code is invalid, it returns the code itself.
+    """
+    try:
+        return langcodes.Language.make(code).language_name()
+    except:
+        return code
+
+
+# ------------------------------
+# Runtime Filtering Functions
+# ------------------------------
+
+def drop_rows_by_runtime(df, column_name='runtime', min_runtime=40, max_runtime=300):
+    """
+    Drops rows where the specified column contains a runtime less than the specified minimum runtime 
+    or greater than the maximum runtime.
     Prints how many rows were dropped and returns the updated DataFrame.
+    
     """
-    # Ensure that 'runtime' column is treated as integers (convert non-numeric to NaN)
     df[column_name] = pd.to_numeric(df[column_name], errors='coerce')
 
     rows_before = len(df)
 
-    # Drop rows where runtime is less than min_runtime
     df.dropna(subset=[column_name], inplace=True)
-    df.drop(df[df[column_name] < min_runtime].index, inplace=True)
+
+    df.drop(df[(df[column_name] < min_runtime) | (df[column_name] > max_runtime)].index, inplace=True)
 
     rows_after = len(df)
 
     rows_dropped = rows_before - rows_after
-    print(f'Number of rows dropped (runtime < {min_runtime}): {rows_dropped}')
+    print(f'Number of rows dropped (runtime < {min_runtime} or runtime > {max_runtime}): {rows_dropped}')
 
     return df

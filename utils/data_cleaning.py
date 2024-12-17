@@ -7,7 +7,10 @@ from datetime import datetime
 # ------------------------------
 
 def remove_duplicates(df):
-    """Remove duplicate rows from a DataFrame."""
+    """
+    Remove duplicate rows from a DataFrame.
+    
+    """
     before_count = len(df)
     df = df.drop_duplicates()
     after_count = len(df)
@@ -15,9 +18,11 @@ def remove_duplicates(df):
     print(f'Removed {removed_count} duplicate rows.')
     return df
 
+
 def drop_empty_rows(df):
     """
     Cleans the DataFrame by removing rows with missing values and reports the number of rows removed.
+    
     """
     original_row_count = df.shape[0]
     df = df.dropna()
@@ -28,10 +33,12 @@ def drop_empty_rows(df):
     
     return df, rows_removed
 
+
 def drop_empty_rows_from_column(df, column_name):
     """
     Drops rows where the specified column has missing values and returns the updated DataFrame.
     Also prints the number of rows deleted.
+    
     """
     initial_rows = len(df)
     df = df.dropna(subset=[column_name])
@@ -47,13 +54,20 @@ def drop_empty_rows_from_column(df, column_name):
 # ------------------------------
 
 def rename_columns(df, rename_dict):
-    """Rename columns based on a dictionary."""
+    """
+    Rename columns based on a dictionary.
+    
+    """
     return df.rename(columns=rename_dict)
 
+
 def standardize_column_names(df):
-    """Standardize column names (lowercase, replace spaces with underscores, and convert camelCase to snake_case)."""
+    """
+    Standardize column names (lowercase, replace spaces with underscores, and convert camelCase to snake_case).
     
-    # convert camelCase to snake_case
+    """
+    
+    
     def camel_to_snake(name):
         return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name).lower() # underscore before uppercase letters
     
@@ -89,8 +103,9 @@ def convert_strings_to_lowercase(df, column_name):
 
 
 def convert_columns_to_int(df, columns):
-    """
-    Converts specified columns in the DataFrame to Int64 type, handling errors gracefully.
+    """ 
+    Converts specified columns in the DataFrame to Int64 type, handling errors gracefully. 
+    
     """
     columns_to_convert = [col for col in columns if col in df.columns]
 

@@ -1,23 +1,33 @@
 import pandas as pd
 
+
 # ------------------------------
 # General DataFrame Info Functions
 # ------------------------------
 
 def show_data_types(df):
-    """Show data types of all columns in the DataFrame."""
+    """
+    Show data types of all columns in the DataFrame.
+    
+    """
     print('Data Types of Columns:')
     print(df.dtypes)
 
 
 def show_missing_values(df):
-    """Show the number of missing values per column."""
+    """
+    Show the number of missing values per column.
+    
+    """
     print('\nMissing Values in Columns:')
     print(df.isnull().sum())
 
 
 def show_basic_info(df):
-    """Show basic information about the DataFrame including shape, dtypes, and missing values."""
+    """
+    Show basic information about the DataFrame including shape, dtypes, and missing values.
+    
+    """
     print(f'\nDataFrame Shape: {df.shape}')
     print(f'Number of Rows: {df.shape[0]}')
     print(f'Number of Columns: {df.shape[1]}')
@@ -30,7 +40,10 @@ def show_basic_info(df):
 
 
 def show_null_percentage(df):
-    """Show percentage of missing values in each column."""
+    """
+    Show percentage of missing values in each column.
+    
+    """
     null_percentage = df.isnull().mean() * 100
     print('\nPercentage of Missing Values in Each Column:')
     print(null_percentage)
@@ -41,13 +54,19 @@ def show_null_percentage(df):
 # ------------------------------
 
 def show_column_summary(df):
-    """Show summary statistics for all columns."""
+    """
+    Show summary statistics for all columns.
+    
+    """
     print('\nSummary Statistics for All Columns:')
     print(df.describe(include='all'))
 
 
 def show_column_values(df, column_name):
-    """Show unique values for a specific column."""
+    """
+    Show unique values for a specific column.
+    
+    """
     if column_name in df.columns:
         print(f'\nUnique values in column {column_name}:')
         print(df[column_name].unique())
@@ -56,7 +75,10 @@ def show_column_values(df, column_name):
 
 
 def show_column_value_counts(df, column_name):
-    """Show value counts for a specific column."""
+    """
+    Show value counts for a specific column.
+    
+    """
     if column_name in df.columns:
         print(f'\nValue counts for column {column_name}:')
         print(df[column_name].value_counts())
@@ -65,7 +87,10 @@ def show_column_value_counts(df, column_name):
         
         
 def show_column_info(df, column_name):
-    """Show detailed information about a specific column."""
+    """
+    Show detailed information about a specific column.
+    
+    """
     if column_name in df.columns:
         print(f'\nColumn Info for {column_name}:')
         print(f'Data Type: {df[column_name].dtype}')
@@ -82,7 +107,10 @@ def show_column_info(df, column_name):
 # ------------------------------
 
 def check_for_duplicates(df):
-    """Check for duplicate rows in the DataFrame."""
+    """
+    Check for duplicate rows in the DataFrame.
+    
+    """
     duplicates = df.duplicated().sum()
     if duplicates > 0:
         print(f'\nThere are {duplicates} duplicate rows in the DataFrame.')
