@@ -40,10 +40,9 @@ The dataset used comes from a combination of **TMDB** (The Movie Database), **IM
 - **NLP Tools**: 
   - **VADER** (for sentiment analysis)
 - **APIs**:
-  - **TMDB API**: For movie metadata and reviews.
-  - **IMDB API**: For additional movie data and user reviews.
-  - **Letterboxd API**: For movie ratings and reviews.
-  - **doesthedogdie.com API**: For trigger warning data.
+  - **[TMDB API](https://developer.themoviedb.org/reference/configuration-details)**: For movie metadata and reviews.
+  - **[Letterboxd API](https://api-docs.letterboxd.com/)**: For movie ratings and reviews.
+  - **[doesthedogdie.com API](https://www.doesthedogdie.com/api)**: For trigger warning data.
 - **Tools**:
   - **Postman**: Used for testing and handling API requests and responses, as well as working with JSON data.
 
