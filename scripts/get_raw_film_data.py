@@ -17,9 +17,7 @@ import helpers
 
 tmdb_df = pd.read_csv('./data/local/raw/TMDB_all_movies.csv')
 
-
 data_inspection.show_basic_info(tmdb_df)
-
 
 # drop columns
 tmdb_df.drop(columns=['cast', 'director_of_photography', 'music_composer', 'poster_path', 'writers', 'spoken_languages', 
