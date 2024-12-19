@@ -1,4 +1,4 @@
-# **Sentiment Analysis of Movie Reviews by Genre and Trigger Warning**
+# **From Script to Score: Sentiment Analysis of Film Content**
 
 ## **Overview**
 This project investigates the sentiment of movie reviews by analyzing the differences between genres and movies with or without trigger warnings. The goal is to explore if there are noticeable patterns in sentiment scores based on genre or trigger warning content. Additionally, we will analyze the relationship between sentiment scores and movie ratings, box office earnings, and other related factors.
@@ -50,3 +50,6 @@ The dataset used comes from a combination of **TMDB** (The Movie Database), **IM
 - Insights into how sentiment varies across movie **genres** and for movies with or without **trigger warnings**.
 - Identification of common words or phrases associated with movies that have trigger warnings.
 - Correlation between movie sentiment and other metrics like **ratings** and **box office earnings**.
+
+## **Resources**
+- [Presentation Slides](https://www.canva.com/design/DAGZlJFVNNg/pOPhf5ZuPbuRFKoOgWR82A/edit?utm_content=DAGZlJFVNNg&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
