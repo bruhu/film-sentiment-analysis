@@ -124,7 +124,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
-.filmenv
+filmenv/
 env/
 venv/
 ENV/
